@@ -1,6 +1,7 @@
 import { MapContainer, TileLayer } from 'react-leaflet';
 import { bergamoMapConfig, tileProviders } from '../../config/mapConfig';
 import type { Hotspot } from '../../types/hotspot';
+import { BrofindCompanyMarker } from './BrofindCompanyMarker';
 import { HotspotMarker } from './HotspotMarker';
 import { MapLegend } from './MapLegend';
 
@@ -44,6 +45,7 @@ export const HotspotMap = ({
           onSelect={onSelectHotspot}
         />
       ))}
+      <BrofindCompanyMarker />
     </MapContainer>
     <MapLegend />
   </section>

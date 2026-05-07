@@ -3,9 +3,9 @@ import { Factory, Leaf, Radar, UsersRound } from 'lucide-react';
 export const Header = () => (
   <header className="relative overflow-hidden border-b border-slate-200 bg-white">
     <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brofind-red via-brofind-blue to-brofind-cyan" />
-    <div className="mx-auto grid max-w-[1600px] gap-6 px-4 py-6 lg:grid-cols-[1fr_auto] lg:px-6">
-      <div>
-        <div className="mb-3 flex flex-wrap items-center gap-2">
+    <div className="mx-auto flex max-w-[1600px] flex-col items-center gap-6 px-4 py-6 text-center lg:px-6">
+      <div className="flex w-full max-w-4xl flex-col items-center">
+        <div className="mb-3 flex flex-wrap items-center justify-center gap-2">
           <span className="inline-flex items-center gap-2 rounded-full bg-red-50 px-3 py-1 text-xs font-bold uppercase tracking-wide text-brofind-red ring-1 ring-red-100">
             <Radar className="h-4 w-4" />
             Demo Challenge - Bergamo
@@ -19,7 +19,7 @@ export const Header = () => (
         <img
           src="/assets/logo-sprint.png"
           alt="BROFIND Find You"
-          className="w-full max-w-[760px] rounded-lg bg-white object-contain"
+          className="mx-auto w-full max-w-[820px] rounded-lg bg-white object-contain"
         />
         <p className="mt-2 text-lg font-semibold text-brofind-blue">
           Industrial Hotspot Intelligence Platform
@@ -30,7 +30,7 @@ export const Header = () => (
           comune tra sales, engineering e management.
         </p>
       </div>
-      <div className="grid grid-cols-3 gap-3 self-end rounded-lg bg-slate-50 p-3 ring-1 ring-slate-200">
+      <div className="grid w-full max-w-4xl grid-cols-1 gap-3 rounded-lg bg-slate-50 p-3 text-left ring-1 ring-slate-200 sm:grid-cols-3">
         {[
           ['Sales', 'prospecting mirato', UsersRound],
           ['Tecnico', 'contesto prima del contatto', Factory],

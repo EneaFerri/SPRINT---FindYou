@@ -3,10 +3,16 @@ export const bergamoMapConfig = {
   zoom: 10,
   bounds: {
     north: 45.9,
-    south: 45.38,
+    south: 45.42,
     east: 10.08,
-    west: 9.35,
+    west: 9.1,
   },
+};
+
+export const brofindCompanyLocation = {
+  name: 'BROFIND',
+  address: 'Viale Stelvio 5, Milano',
+  coordinates: [45.4936, 9.1893] as [number, number],
 };
 
 export const tileProviders = {
