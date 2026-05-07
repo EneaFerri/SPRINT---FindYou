@@ -15,9 +15,12 @@ export const Header = () => (
             Green industrial intelligence
           </span>
         </div>
-        <h1 className="text-3xl font-black tracking-tight text-slate-950 md:text-5xl">
-          BROFIND <span className="text-brofind-red">— Find You</span>
-        </h1>
+        <h1 className="sr-only">BROFIND — Find You</h1>
+        <img
+          src="/assets/logo-sprint.png"
+          alt="BROFIND Find You"
+          className="w-full max-w-[760px] rounded-lg bg-white object-contain"
+        />
         <p className="mt-2 text-lg font-semibold text-brofind-blue">
           Industrial Hotspot Intelligence Platform
         </p>
