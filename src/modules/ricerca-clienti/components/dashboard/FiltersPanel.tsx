@@ -1,6 +1,7 @@
 import { Filter, RotateCcw } from 'lucide-react';
 import { Button } from '../../../../components/ui/Button';
 import { Card } from '../../../../components/ui/Card';
+import { atecoRiskMock } from '../../data/atecoRisk.mock';
 import type { AbatementStatus, Hotspot, HotspotFilters, PriorityLevel } from '../../types/hotspot';
 import { defaultFilters, uniqueSorted } from '../../services/hotspotFilters';
 
@@ -21,7 +22,6 @@ export const FiltersPanel = ({
 }) => {
   const municipalities = uniqueSorted(hotspots.map((h) => h.municipality));
   const emissions = uniqueSorted(hotspots.flatMap((h) => h.potentialEmissions));
-  const atecoCodes = uniqueSorted(hotspots.map((h) => h.atecoCode));
 
   const isReal = dataSource === 'real';
 
@@ -98,7 +98,10 @@ export const FiltersPanel = ({
           label="ATECO / settore"
           value={filters.ateco}
           onChange={(ateco) => onChange({ ...filters, ateco })}
-          options={[['all', 'Tutti'], ...atecoCodes.map((v) => [v, v])]}
+          options={[
+            ['all', 'Tutti'],
+            ...atecoRiskMock.map(({ code, label }) => [code, `${code} — ${label}`]),
+          ]}
         />
         <Select
           label="Impianto abbattimento"
