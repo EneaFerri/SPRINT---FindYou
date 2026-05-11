@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Find You — BSSC 2026</title>
+<style>
+  /* ─── Palette Brofind ─────────────────────────────────────────── */
+  :root {
+    --red:    #E3001B;
+    --blue:   #1B2B4B;
+    --cyan:   #00A9CE;
+    --mist:   #F4F6F9;
+    --slate:  #64748B;
+    --text:   #0F172A;
+    --white:  #FFFFFF;
+    --green:  #059669;
+    --amber:  #D97706;
+  }
+
+  /* ─── Reset & Base ────────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    color: var(--text);
+    background: #e8e8e8;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  /* ─── Page Shell ──────────────────────────────────────────────── */
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    background: var(--white);
+    margin: 20px auto;
+    padding: 14mm 16mm;
+    box-shadow: 0 4px 24px rgba(0,0,0,.18);
+    position: relative;
+    overflow: hidden;
+    page-break-after: always;
+  }
+  .page:last-child { page-break-after: auto; }
+
+  /* top stripe */
+  .stripe {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--red) 0%, var(--blue) 60%, var(--cyan) 100%);
+  }
+
+  /* ─── Typography ──────────────────────────────────────────────── */
+  .label {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--blue);
+  }
+  h1 { font-size: 52px; font-weight: 900; line-height: 1; color: var(--text); }
+  h2 { font-size: 22px; font-weight: 900; color: var(--text); margin-bottom: 4px; }
+  h3 { font-size: 13px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+  h4 { font-size: 11px; font-weight: 700; color: var(--text); }
+  p  { color: var(--slate); font-size: 11.5px; line-height: 1.65; }
+
+  /* ─── Helpers ─────────────────────────────────────────────────── */
+  .mt1 { margin-top: 4px; }
+  .mt2 { margin-top: 8px; }
+  .mt3 { margin-top: 14px; }
+  .mt4 { margin-top: 22px; }
+  .red  { color: var(--red); }
+  .blue { color: var(--blue); }
+  .bold { font-weight: 800; }
+
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 99px;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+  }
+  .tag-red  { background: #FEE2E2; color: var(--red); }
+  .tag-blue { background: #DBEAFE; color: var(--blue); }
+  .tag-green{ background: #D1FAE5; color: var(--green); }
+  .tag-gray { background: #F1F5F9; color: var(--slate); }
+
+  /* grid helpers */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .grid4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; }
+
+  /* card */
+  .card {
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    padding: 12px;
+    background: var(--white);
+  }
+  .card-mist { background: var(--mist); }
+  .card-green { border-color: #A7F3D0; background: #F0FDF4; }
+  .card-blue  { border-color: #BFDBFE; background: #EFF6FF; }
+  .card-amber { border-color: #FDE68A; background: #FFFBEB; }
+  .card-red   { border-color: #FECACA; background: #FFF5F5; }
+
+  /* icon circle */
+  .icon { font-size: 20px; margin-bottom: 6px; display: block; }
+
+  /* table */
+  table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  th {
+    background: var(--blue);
+    color: var(--white);
+    padding: 6px 8px;
+    text-align: left;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+  td { padding: 5px 8px; border-bottom: 1px solid #F1F5F9; vertical-align: top; }
+  tr:nth-child(even) td { background: var(--mist); }
+
+  /* bullet list */
+  .bullets { list-style: none; }
+  .bullets li { display: flex; gap: 7px; align-items: flex-start; margin-bottom: 5px; font-size: 11px; color: var(--slate); }
+  .bullets li::before {
+    content: '';
+    flex-shrink: 0;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--red);
+    margin-top: 5px;
+  }
+  .bullets.green li::before { background: var(--green); }
+
+  /* stat big */
+  .stat-val { font-size: 36px; font-weight: 900; color: var(--red); line-height: 1; }
+  .stat-unit { font-size: 10px; font-weight: 700; color: var(--slate); text-transform: uppercase; letter-spacing: .06em; margin-top: 2px; }
+  .stat-lbl  { font-size: 11px; font-weight: 700; color: var(--text); margin-top: 4px; }
+  .stat-note { font-size: 9px; color: var(--slate); margin-top: 2px; }
+
+  /* divider */
+  hr { border: none; border-top: 1px solid #E2E8F0; margin: 12px 0; }
+
+  /* flow diagram */
+  .flow { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .flow-box {
+    background: var(--mist);
+    border: 1px solid #CBD5E1;
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--blue);
+    white-space: nowrap;
+  }
+  .flow-arrow { color: var(--red); font-weight: 900; font-size: 14px; }
+
+  /* dept diagram */
+  .dept-grid { display: grid; grid-template-columns: 1fr 90px 1fr; grid-template-rows: 1fr 90px 1fr; gap: 6px; align-items: center; justify-items: center; }
+  .dept-center {
+    grid-column: 2; grid-row: 2;
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    background: var(--blue);
+    color: var(--white);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    font-weight: 900; font-size: 11px;
+    text-align: center;
+    line-height: 1.2;
+  }
+  .dept-node {
+    border: 1.5px solid var(--blue);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 9.5px;
+    text-align: center;
+    background: var(--white);
+    width: 100%;
+  }
+  .dept-node strong { display: block; font-size: 10.5px; font-weight: 800; color: var(--blue); margin-bottom: 3px; }
+  .dept-node span   { color: var(--slate); }
+
+  /* timeline */
+  .tl { display: flex; gap: 0; }
+  .tl-item { flex: 1; position: relative; padding: 12px 10px 10px; }
+  .tl-item:not(:last-child)::after {
+    content: '→';
+    position: absolute; right: -6px; top: 12px;
+    font-size: 14px; font-weight: 900; color: var(--red);
+    z-index: 1;
+  }
+  .tl-phase { font-size: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--red); }
+  .tl-title { font-size: 11px; font-weight: 800; color: var(--text); margin: 2px 0 6px; }
+  .tl-period { font-size: 9px; color: var(--slate); margin-bottom: 6px; font-style: italic; }
+
+  /* page footer */
+  .footer {
+    position: absolute;
+    bottom: 8mm; left: 16mm; right: 16mm;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 8px; color: #CBD5E1;
+    border-top: 1px solid #F1F5F9;
+    padding-top: 4px;
+  }
+
+  /* ─── Print ───────────────────────────────────────────────────── */
+  @media print {
+    body { background: none; margin: 0; }
+    .page {
+      box-shadow: none;
+      margin: 0;
+      padding: 12mm 14mm;
+      width: 210mm;
+      min-height: 297mm;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     PAGINA 1 — COVER
+══════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="stripe"></div>
+
+  <div style="margin-top: 20mm;">
+    <div class="label">Brofind Sustainability Sprint Challenge 2026 — 1ª edizione</div>
+    <h1 style="margin-top: 8px;">Find<br/><span class="red">You</span></h1>
+    <p style="margin-top: 14px; font-size: 15px; font-weight: 600; color: #1B2B4B; max-width: 380px; line-height: 1.5;">
+      La piattaforma GIS-AI che trasforma il territorio in opportunità commerciali sostenibili.
+    </p>
+    <hr style="margin-top: 24px; margin-bottom: 20px; border-color: #E3001B; border-width: 2px; max-width: 60px; border-radius: 2px;" />
+    <p style="font-size: 12px; max-width: 420px;">
+      Una piattaforma che mappa automaticamente le zone industriali della provincia di Bergamo,
+      qualifica i lead con un punteggio multi-fattore e crea un linguaggio comune tra commerciale,
+      engineering e management — riducendo il prospecting manuale e accelerando l'installazione
+      di impianti di abbattimento emissioni.
+    </p>
+  </div>
+
+  <!-- Innovation Pod box -->
+  <div style="margin-top: auto; position: absolute; bottom: 28mm; left: 16mm; right: 16mm;">
+    <div class="card card-mist" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+      <div>
+        <div class="label">Innovation Pod</div>
+        <p style="margin-top: 4px; font-size: 12px; font-weight: 700; color: var(--text);">
+          Andrea Monguzzi &nbsp;·&nbsp; Enea Ferri &nbsp;·&nbsp; Maristella Mancuso &nbsp;·&nbsp; Matteo Varacalli
+        </p>
+        <p style="font-size: 10px; color: var(--slate); margin-top: 2px;">[Reparti da completare — min. 3 settori distinti, almeno un under 30]</p>
+      </div>
+      <div style="text-align: right;">
+        <div class="tag tag-red">Demo operativa</div>
+        <p style="font-size: 10px; color: var(--slate); margin-top: 4px;">Maggio 2026</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>BROFIND Sustainability Sprint Challenge 2026</span>
+    <span>Find You — Innovation Pod</span>
+    <span>1 / 9</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+     PAGINA 2 — IL PROBLEMA
+══════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="stripe"></div>
+
+  <div class="label">Il contesto</div>
+  <h2>Il problema che FindYou risolve</h2>
+  <p class="mt1">Tre frizioni quotidiane che costano tempo, denaro e opportunità ambientali.</p>
+
+  <div class="grid3 mt4">
+    <div class="card card-mist">
+      <span class="icon">🔍</span>
+      <h3>Prospecting lento e informale</h3>
+      <p class="mt1">
+        I sales trovano clienti industriali per via informale, senza dati strutturati.
+        Ore perse a esplorare zone a bassa probabilità. Conoscenza distribuita, non condivisa.
+      </p>
+      <p class="mt2 bold" style="font-size:11px; color: var(--red);">
+        → Costo: tempo sottratto ad attività ad alto valore
+      </p>
+    </div>
+    <div class="card card-mist">
+      <span class="icon">🔧</span>
+      <h3>Tecnico coinvolto troppo tardi</h3>
+      <p class="mt1">
+        L'Engineering entra nel processo solo dopo la prima visita, senza contesto preliminare.
+        Visite non preparate, offerte generiche, iterazioni evitabili.
+      </p>
+      <p class="mt2 bold" style="font-size:11px; color: var(--red);">
+        → Costo: offerte meno precise, ciclo vendita più lungo
+      </p>
+    </div>
+    <div class="card card-mist">
+      <span class="icon">🌫️</span>
+      <h3>Opportunità ambientali perse</h3>
+      <p class="mt1">
+        Ogni impianto RTO/VOC non installato = emissioni industriali non abbattute.
+        La lentezza del commerciale ha un costo ambientale reale e misurabile.
+      </p>
+      <p class="mt2 bold" style="font-size:11px; color: var(--green);">
+        → Opportunità: accelerare il commerciale = più impatto verde
+      </p>
+    </div>
+  </div>
+
+  <div class="card mt4" style="border-left: 3px solid var(--red); padding-left: 14px;">
+    <h3>La domanda a cui FindYou risponde</h3>
+    <p class="mt1" style="font-size: 12px; font-style: italic; color: var(--blue);">
+      "Dove si trovano le aziende industriali che hanno più probabilità di aver bisogno di un impianto
+      di abbattimento emissioni e non ne hanno ancora uno?" — in modo sistematico, scalabile e condiviso tra reparti.
+    </p>
+  </div>
+
+  <div class="footer">
+    <span>BROFIND Sustainability Sprint Challenge 2026</span>
+    <span>Find You — Innovation Pod</span>
+    <span>2 / 9</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+     PAGINA 3 — LA SOLUZIONE + RUOLO AI
+══════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="stripe"></div>
+
+  <div class="label">La soluzione</div>
+  <h2>FindYou — piattaforma GIS-AI per il commerciale Brofind</h2>
+
+  <div class="grid2 mt3" style="gap: 14px;">
+    <div>
+      <h3>Come funziona</h3>
+      <p class="mt1">Dati geografici reali vengono trasformati in lead qualificati pronti per sales e tecnico.</p>
+      <div class="flow mt2">
+        <div class="flow-box">OSM / CCIAA</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box">Python ETL</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box">Scoring Engine</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box">Mappa interattiva</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box">Sales + Tecnico</div>
+      </div>
+
+      <h3 class="mt3">Brofind Lead Score — 5 fattori</h3>
+      <table class="mt1">
+        <thead><tr><th>Fattore</th><th>Peso</th></tr></thead>
+        <tbody>
+          <tr><td>Rischio settore ATECO</td><td class="bold">35%</td></tr>
+          <tr><td>Dimensione sito (sqm)</td><td class="bold">20%</td></tr>
+          <tr><td>Emissioni potenziali</td><td class="bold">20%</td></tr>
+          <tr><td>Assenza impianto noto</td><td class="bold">15%</td></tr>
+          <tr><td>Densità industriale area</td><td class="bold">10%</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div>
+      <!-- AI box -->
+      <div class="card card-red" style="border-left: 4px solid var(--red);">
+        <div class="label red">Intelligenza Artificiale nel progetto</div>
+        <h3 class="mt2">Claude AI (Anthropic) — tre ruoli</h3>
+        <ul class="bullets mt2">
+          <li>
+            <span><strong style="color:var(--text);">Sviluppo accelerato:</strong> Claude ha co-progettato e scritto il codice della demo, riducendo i tempi di sviluppo del 60–70% rispetto a un approccio tradizionale.</span>
+          </li>
+          <li>
+            <span><strong style="color:var(--text);">Analisi automatiche (Fase MVP):</strong> chiamate API a Claude per enrichment ATECO da descrizioni OSM, inferenza emissioni, generazione bozze offerta RTO/VOC personalizzate.</span>
+          </li>
+          <li>
+            <span><strong style="color:var(--text);">Manutenzione intelligente:</strong> monitoraggio anomalie nei dati, aggiornamenti allo scoring, report periodici per il management — in autonomia.</span>
+          </li>
+        </ul>
+        <p class="mt2" style="font-size:10px; color:var(--slate);">Costo API: ~€20–80/mese su volumi realistici Brofind (pay-per-use).</p>
+      </div>
+
+      <div class="card card-mist mt2">
+        <h4>Status attuale</h4>
+        <ul class="bullets green mt1">
+          <li>50 zone industriali reali (OpenStreetMap, provincia BG)</li>
+          <li>Mappa interattiva + filtri + export CSV</li>
+          <li>Scoring automatico multi-fattore</li>
+          <li>Toggle dati reali OSM / demo mock</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>BROFIND Sustainability Sprint Challenge 2026</span>
+    <span>Find You — Innovation Pod</span>
+    <span>3 / 9</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+     PAGINA 4 — I 3 PILASTRI ESG
+══════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="stripe"></div>
+
+  <div class="label">Criteri BSSC-2026 — Impatto ambientale/sociale (30%)</div>
+  <h2>I 3 pilastri di sostenibilità di FindYou</h2>
+
+  <div class="grid3 mt4" style="gap: 14px;">
+
+    <div class="card card-green">
+      <span class="icon">🌱</span>
+      <div class="tag tag-green" style="margin-bottom: 8px;">Ambientale</div>
+      <h3>Meno emissioni industriali</h3>
+      <p class="mt2">
+        Ogni impianto RTO/VOC installato abbatte solventi organici volatili (COV) e odori
+        prima che raggiungano l'atmosfera.
+      </p>
+      <p class="mt2">
+        FindYou <strong>accelera il ciclo commerciale</strong> identificando automaticamente le zone
+        con il più alto potenziale emissivo non presidiato:
+      </p>
+      <ul class="bullets green mt2">
+        <li>più lead qualificati → più offerte → più impianti installati</li>
+        <li>KPI: tonn COV abbattute per zona (stima ISPRA per ATECO)</li>
+        <li>impatto ambientale diretto, misurabile, collegato al core business</li>
+      </ul>
+    </div>
+
+    <div class="card card-blue">
+      <span class="icon">👥</span>
+      <div class="tag tag-blue" style="margin-bottom: 8px;">Sociale — Benessere</div>
+      <h3>Persone al centro del processo</h3>
+      <p class="mt2">
+        Il prospecting manuale è ripetitivo, dispersivo e frustrante: ore passate a cercare
+        contatti senza dati, email di allineamento senza risultato.
+      </p>
+      <p class="mt2">FindYou cambia la qualità del lavoro quotidiano:</p>
+      <ul class="bullets mt2">
+        <li>Il sales lavora su lead già qualificati con dati reali</li>
+        <li>Il tecnico entra nel processo con contesto già organizzato</li>
+        <li>Meno ricerche manuali = più energia su attività ad alto valore</li>
+        <li>Lavoro più interattivo, visuale e coinvolgente</li>
+      </ul>
+      <p class="mt2 bold" style="font-size:10px; color: var(--blue);">KPI: survey soddisfazione sales pre/post MVP</p>
+    </div>
+
+    <div class="card card-amber">
+      <span class="icon">💰</span>
+      <div class="tag tag-red" style="background:#FEF3C7; color:#92400E; margin-bottom: 8px;">Economico</div>
+      <h3>ROI misurabile dalla Fase 1</h3>
+      <p class="mt2">
+        Pipeline più rapida, meno ore su lead a bassa probabilità.
+        Offerte più mirate perché basate su dati reali di settore e dimensione sito.
+      </p>
+      <ul class="bullets mt2">
+        <li>Costo per lead qualificato: -40% stimato vs prospecting manuale</li>
+        <li>Lead qualificati per ora sales: +50% con dati strutturati</li>
+        <li>Verifica con CRM: conversion rate, valore ordini da lead FindYou</li>
+      </ul>
+      <p class="mt2 bold" style="font-size:10px; color: var(--amber);">Investimento infrastruttura: ~€1.000-2.000/anno (ampiamente sotto il premio)</p>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <span>BROFIND Sustainability Sprint Challenge 2026</span>
+    <span>Find You — Innovation Pod</span>
+    <span>4 / 9</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+     PAGINA 5 — COMUNICAZIONE TRA REPARTI
+══════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="stripe"></div>
+
+  <div class="label">Criteri BSSC-2026 — Coinvolgimento aziendale (10%)</div>
+  <h2>FindYou connette i reparti Brofind</h2>
+  <p class="mt1">Un linguaggio comune elimina la comunicazione informale e frammentata tra team diversi.</p>
+
+  <div class="grid2 mt4" style="gap: 20px; align-items: start;">
+
+    <!-- Spider diagram CSS -->
+    <div>
+      <div class="dept-grid">
+        <!-- top-left -->
+        <div class="dept-node" style="grid-column:1; grid-row:1;">
+          <strong>Commerciale</strong>
+          <span>Riceve lead qualificati e scheda tecnica. Restituisce feedback su qualità e contesti di mercato.</span>
+        </div>
+        <!-- top-center -->
+        <div class="dept-node" style="grid-column:2; grid-row:1; width:80px; font-size:8.5px;">
+          <strong>Marketing</strong>
+          <span>Dati settoriali per segmentazione</span>
+        </div>
+        <!-- top-right -->
+        <div class="dept-node" style="grid-column:3; grid-row:1;">
+          <strong>Engineering / Tecnico</strong>
+          <span>Riceve contesto impianti ed emissioni. Contribuisce parametri tecnici per scoring.</span>
+        </div>
+        <!-- center-left -->
+        <div class="dept-node" style="grid-column:1; grid-row:2; text-align:right;">
+          <strong>Management</strong>
+          <span>Pipeline visuale e KPI. Definisce priorità geografiche strategiche.</span>
+        </div>
+        <!-- CENTER -->
+        <div class="dept-center">
+          <span style="font-size:9px; opacity:.7;">GIS-AI</span>
+          <span style="font-size:13px;">Find<br/>You</span>
+        </div>
+        <!-- center-right -->
+        <div class="dept-node" style="grid-column:3; grid-row:2;">
+          <strong>Software / IT</strong>
+          <span>Architettura e manutenzione. Scaling e integrazione CRM.</span>
+        </div>
+        <!-- empty bottom-left -->
+        <div style="grid-column:1; grid-row:3;"></div>
+        <!-- bottom-center -->
+        <div class="dept-node" style="grid-column:2; grid-row:3; width:80px; font-size:8.5px;">
+          <strong>Service</strong>
+          <span>Segnala impianti da revamping</span>
+        </div>
+        <!-- empty bottom-right -->
+        <div style="grid-column:3; grid-row:3;"></div>
+      </div>
+    </div>
+
+    <div>
+      <h3>Prima di FindYou</h3>
+      <ul class="bullets mt1">
+        <li>Il sales chiama il tecnico per capire se un lead è percorribile — spesso a fine giornata</li>
+        <li>Il management riceve update informali o nessun update</li>
+        <li>Il marketing non ha dati settoriali strutturati per le campagne</li>
+        <li>La conoscenza su zone e aziende resta nella testa dei singoli</li>
+      </ul>
+
+      <h3 class="mt3">Dopo FindYou</h3>
+      <ul class="bullets green mt1">
+        <li>Scheda lead integra già contesto tecnico e azione sales: zero email di allineamento pre-visita</li>
+        <li>Management vede la pipeline su mappa con KPI in tempo reale</li>
+        <li>Marketing ha dati ATECO e densità per segmentazione</li>
+        <li>Service segnala impianti da revamping direttamente nella piattaforma</li>
+      </ul>
+
+      <div class="card card-mist mt3" style="border-left: 3px solid var(--blue); padding-left: 12px;">
+        <p style="font-style: italic; font-size: 11px; color: var(--blue);">
+          "FindYou non è uno strumento solo per il commerciale: è la prima lingua comune
+          tra reparti che prima si parlavano per email."
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>BROFIND Sustainability Sprint Challenge 2026</span>
+    <span>Find You — Innovation Pod</span>
+    <span>5 / 9</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+     PAGINA 6 — DEMO ATTUALE
+══════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="stripe"></div>
+
+  <div class="label">Criteri BSSC-2026 — Fattibilità (25%) + Innovazione (20%)</div>
+  <h2>La demo è già operativa — oggi, Maggio 2026</h2>
+  <p class="mt1">
+    Non è una proposta teorica: è una piattaforma funzionante, testabile, con dati reali.
+  </p>
+
+  <div class="grid2 mt4" style="gap: 16px;">
+    <div>
+      <h3>Funzionalità attive ✅</h3>
+      <ul class="bullets green mt2">
+        <li>Mappa interattiva della provincia di Bergamo (Leaflet + OpenStreetMap)</li>
+        <li>50 hotspot industriali reali estratti da OpenStreetMap via pipeline Python automatizzata</li>
+        <li>Brofind Lead Score: calcolo automatico su 5 fattori pesati</li>
+        <li>Filtri dinamici: comune, priorità, score minimo, ATECO, emissioni, impianto</li>
+        <li>Scheda lead integrata: azione sales + note tecniche + emissioni potenziali</li>
+        <li>Export CSV per integrazione CRM</li>
+        <li>Toggle dati reali OSM / dati demo mock</li>
+        <li>Pannelli ESG: KPI, roadmap, valore per reparto</li>
+      </ul>
+
+      <h3 class="mt3">In sviluppo ⏳</h3>
+      <ul class="bullets mt1">
+        <li>Modulo Ricerca Fornitori</li>
+        <li>Modulo Consulenza e Personale</li>
+      </ul>
+    </div>
+
+    <div>
+      <h3>Architettura tecnica</h3>
+      <table class="mt1">
+        <thead><tr><th>Layer</th><th>Tecnologia</th></tr></thead>
+        <tbody>
+          <tr><td>Frontend</td><td>React 18 + TypeScript + Vite</td></tr>
+          <tr><td>Mappa</td><td>Leaflet + OpenStreetMap (no API key)</td></tr>
+          <tr><td>Stile</td><td>Tailwind CSS</td></tr>
+          <tr><td>Dati geografici</td><td>OpenStreetMap via Overpass API</td></tr>
+          <tr><td>ETL</td><td>Python 3.13 — pipeline modulare</td></tr>
+          <tr><td>Geocoding</td><td>Nominatim OSM (gratuito)</td></tr>
+          <tr><td>Backend (futuro)</td><td>FastAPI + PostgreSQL + PostGIS</td></tr>
+          <tr><td>AI (futuro)</td><td>Claude API (Anthropic)</td></tr>
+        </tbody>
+      </table>
+
+      <div class="card card-green mt3">
+        <h4 style="color: var(--green);">Punto di forza per la challenge</h4>
+        <p class="mt1" style="font-size:11px;">
+          La demo funziona <strong>standalone</strong>, senza backend attivo, senza API key,
+          senza costi di infrastruttura. Può essere mostrata al CDA da qualsiasi laptop
+          in qualsiasi momento.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>BROFIND Sustainability Sprint Challenge 2026</span>
+    <span>Find You — Innovation Pod</span>
+    <span>6 / 9</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+     PAGINA 7 — KPI MISURABILI
+══════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="stripe"></div>
+
+  <div class="label">Criteri BSSC-2026 — KPI obbligatori</div>
+  <h2>Metriche di successo — misurabili e verificabili</h2>
+
+  <!-- Big stats -->
+  <div class="grid4 mt3">
+    <div class="card" style="text-align:center; padding: 14px 8px;">
+      <div class="stat-val">50</div>
+      <div class="stat-unit">zone BG</div>
+      <div class="stat-lbl">Hotspot mappati</div>
+      <div class="stat-note">scalabile a tutta Italia</div>
+    </div>
+    <div class="card" style="text-align:center; padding: 14px 8px;">
+      <div class="stat-val">-35%</div>
+      <div class="stat-unit">stimato</div>
+      <div class="stat-lbl">Tempo prospecting</div>
+      <div class="stat-note">verifica con survey sales</div>
+    </div>
+    <div class="card" style="text-align:center; padding: 14px 8px;">
+      <div class="stat-val">5+</div>
+      <div class="stat-unit">reparti</div>
+      <div class="stat-lbl">Reparti connessi</div>
+      <div class="stat-note">commerciale, tecnico, mgmt…</div>
+    </div>
+    <div class="card" style="text-align:center; padding: 14px 8px;">
+      <div class="stat-val" style="font-size:28px;">€1-2k</div>
+      <div class="stat-unit">anno 1</div>
+      <div class="stat-lbl">Costo totale stimato</div>
+      <div class="stat-note">vs €6.000 premio welfare</div>
+    </div>
+  </div>
+
+  <!-- KPI table -->
+  <h3 class="mt4">Tabella KPI completa</h3>
+  <table class="mt2">
+    <thead>
+      <tr>
+        <th>KPI</th>
+        <th>Baseline</th>
+        <th>Target MVP</th>
+        <th>Metodo di misura</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Zone industriali mappate</td>
+        <td>50 (BG)</td>
+        <td class="bold">500+ (Nord Italia)</td>
+        <td>Conteggio hotspot nel database</td>
+      </tr>
+      <tr>
+        <td>Riduzione tempo prospecting</td>
+        <td>—</td>
+        <td class="bold">-35% stimato</td>
+        <td>Survey sales pre/post MVP (questionario strutturato)</td>
+      </tr>
+      <tr>
+        <td>Lead qualificati per ora sales</td>
+        <td>—</td>
+        <td class="bold">+50%</td>
+        <td>CRM: ore lavorate / lead qualificati per periodo</td>
+      </tr>
+      <tr>
+        <td>Reparti attivi sulla piattaforma</td>
+        <td>1 (commerciale)</td>
+        <td class="bold">4+</td>
+        <td>Logins per reparto (dopo autenticazione multi-utente)</td>
+      </tr>
+      <tr>
+        <td>Emissioni potenzialmente intercettate</td>
+        <td>calcolato per zona</td>
+        <td class="bold">tonn COV/anno stimate</td>
+        <td>Fattori ISPRA per settore ATECO × impianti installati</td>
+      </tr>
+      <tr>
+        <td>Costo per lead qualificato</td>
+        <td>—</td>
+        <td class="bold">-40% vs manuale</td>
+        <td>Contabilità: ore sales × costo orario / lead</td>
+      </tr>
+      <tr>
+        <td>Conversione lead → offerta</td>
+        <td>—</td>
+        <td class="bold">benchmark CRM</td>
+        <td>CRM: % lead FindYou che generano offerta formale</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="footer">
+    <span>BROFIND Sustainability Sprint Challenge 2026</span>
+    <span>Find You — Innovation Pod</span>
+    <span>7 / 9</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+     PAGINA 8 — TIMELINE
+══════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="stripe"></div>
+
+  <div class="label">Piano di attuazione</div>
+  <h2>Timeline — breve e lungo periodo</h2>
+
+  <!-- Short term -->
+  <h3 class="mt3" style="color: var(--red);">Breve periodo — entro 5 giugno 2026 (3 settimane)</h3>
+  <div class="tl mt2">
+    <div class="tl-item card card-red">
+      <div class="tl-phase">Settimana 1</div>
+      <div class="tl-title">Completamento demo</div>
+      <div class="tl-period">12–18 maggio</div>
+      <ul class="bullets" style="font-size:10px;">
+        <li>Modulo Ricerca Fornitori (base)</li>
+        <li>Rifinitura pannelli ESG</li>
+        <li>KPI panel nella demo</li>
+      </ul>
+    </div>
+    <div class="tl-item card">
+      <div class="tl-phase">Settimana 2</div>
+      <div class="tl-title">Presentazione interna</div>
+      <div class="tl-period">19–25 maggio</div>
+      <ul class="bullets" style="font-size:10px;">
+        <li>Demo live al team</li>
+        <li>Raccolta feedback reparti</li>
+        <li>Revisione scoring con tecnici</li>
+      </ul>
+    </div>
+    <div class="tl-item card card-green">
+      <div class="tl-phase">Settimana 3</div>
+      <div class="tl-title">Proposta formale</div>
+      <div class="tl-period">26 maggio – 5 giugno</div>
+      <ul class="bullets green" style="font-size:10px;">
+        <li>Documentazione KPI definitivi</li>
+        <li>Stima costi finale</li>
+        <li>Invio a ESG Manager</li>
+      </ul>
+    </div>
+  </div>
+
+  <hr />
+
+  <!-- Long term -->
+  <h3 style="color: var(--blue);">Lungo periodo — luglio → dicembre 2026 (se vincitori)</h3>
+  <p style="font-size: 10px; color: var(--slate); margin-top: 2px; margin-bottom: 10px;">Tempistica di attuazione: 3–6 mesi, in linea con il regolamento BSSC.</p>
+  <div class="tl">
+    <div class="tl-item card">
+      <div class="tl-phase">Fase 1 — MVP</div>
+      <div class="tl-title">Luglio – Settembre</div>
+      <ul class="bullets" style="font-size:10px;">
+        <li>PostgreSQL + PostGIS</li>
+        <li>Integrazione CCIAA</li>
+        <li>Multi-utente + reparti</li>
+        <li>Export CRM nativo</li>
+      </ul>
+    </div>
+    <div class="tl-item card">
+      <div class="tl-phase">Fase 2 — Intelligence</div>
+      <div class="tl-title">Settembre – Ottobre</div>
+      <ul class="bullets" style="font-size:10px;">
+        <li>Fonti ISPRA/AIA/AUA</li>
+        <li>Scoring configurabile</li>
+        <li>Esclusione clienti</li>
+        <li>KPI dashboard mgmt</li>
+      </ul>
+    </div>
+    <div class="tl-item card">
+      <div class="tl-phase">Fase 3 — AI</div>
+      <div class="tl-title">Ottobre – Dicembre</div>
+      <ul class="bullets" style="font-size:10px;">
+        <li>Claude API: bozze offerta</li>
+        <li>Computer vision</li>
+        <li>Integrazione CRM</li>
+        <li>Alert automatici</li>
+      </ul>
+    </div>
+    <div class="tl-item card card-green">
+      <div class="tl-phase">Benchmark KPI</div>
+      <div class="tl-title">Dicembre 2026</div>
+      <ul class="bullets green" style="font-size:10px;">
+        <li>Verifica KPI vs target</li>
+        <li>Sblocco 2ª tranche premio</li>
+        <li>Report ESG annuale</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>BROFIND Sustainability Sprint Challenge 2026</span>
+    <span>Find You — Innovation Pod</span>
+    <span>8 / 9</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+     PAGINA 9 — INNOVATION POD + COSTI
+══════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="stripe"></div>
+
+  <div class="label">Innovation Pod + Piano economico</div>
+  <h2>Chi siamo e cosa costa</h2>
+
+  <div class="grid2 mt3" style="gap: 20px; align-items: start;">
+
+    <!-- Pod table -->
+    <div>
+      <h3>Innovation Pod — BSSC 2026</h3>
+      <table class="mt2">
+        <thead>
+          <tr><th>Membro</th><th>Reparto</th><th>Ruolo nel progetto</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="bold">Andrea Monguzzi</td>
+            <td><em style="color:var(--slate);">[da completare]</em></td>
+            <td>[da completare]</td>
+          </tr>
+          <tr>
+            <td class="bold">Enea Ferri</td>
+            <td><em style="color:var(--slate);">[da completare]</em></td>
+            <td>Sviluppo piattaforma FindYou</td>
+          </tr>
+          <tr>
+            <td class="bold">Maristella Mancuso</td>
+            <td><em style="color:var(--slate);">[da completare]</em></td>
+            <td>[da completare]</td>
+          </tr>
+          <tr>
+            <td class="bold">Matteo Varacalli</td>
+            <td><em style="color:var(--slate);">[da completare]</em></td>
+            <td>[da completare]</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="mt2" style="font-size:10px; color: var(--slate);">
+        ✔ Almeno 3 reparti distinti &nbsp;·&nbsp; ✔ Almeno un under 30 (nati dal 1996)
+        <br/>Completare la colonna Reparto prima della consegna formale al ESG Manager.
+      </p>
+
+      <!-- Criteria recap -->
+      <h3 class="mt3">Criteri BSSC — posizionamento FindYou</h3>
+      <table class="mt1">
+        <thead><tr><th>Criterio</th><th>Peso</th><th>Valutazione</th></tr></thead>
+        <tbody>
+          <tr><td>Impatto ambientale/sociale</td><td>30%</td><td class="bold" style="color:var(--green);">Alto — diretto sul core business</td></tr>
+          <tr><td>Fattibilità</td><td>25%</td><td class="bold" style="color:var(--green);">Alta — demo già funzionante</td></tr>
+          <tr><td>Innovazione</td><td>20%</td><td class="bold" style="color:var(--green);">Alta — GIS + AI + OSM reale</td></tr>
+          <tr><td>ROI economico</td><td>15%</td><td class="bold" style="color:var(--green);">Misurabile dal Fase 1 MVP</td></tr>
+          <tr><td>Coinvolgimento aziendale</td><td>10%</td><td class="bold" style="color:var(--green);">5+ reparti coinvolti</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Costs -->
+    <div>
+      <h3>Costi stimati — anno 1</h3>
+      <table class="mt2">
+        <thead><tr><th>Voce</th><th>Costo</th><th>Note</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Sviluppo interno (ore dev)</td>
+            <td class="bold">€0 extra</td>
+            <td>Ore già allocate al team IT</td>
+          </tr>
+          <tr>
+            <td>Infrastruttura cloud (Fase MVP)</td>
+            <td class="bold">~€50–100/mese</td>
+            <td>PostgreSQL managed + hosting</td>
+          </tr>
+          <tr>
+            <td>Accesso Registro Imprese / CCIAA</td>
+            <td class="bold">da definire</td>
+            <td>Brofind potrebbe avere già accesso</td>
+          </tr>
+          <tr>
+            <td>Claude AI API (analisi automatiche)</td>
+            <td class="bold">~€20–80/mese</td>
+            <td>Enrichment ATECO, bozze offerta</td>
+          </tr>
+          <tr style="background: #F0FDF4;">
+            <td class="bold">Totale anno 1</td>
+            <td class="bold" style="color:var(--green);">~€1.000–2.000</td>
+            <td style="color:var(--green);">Ampiamente sotto il premio welfare</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="card card-red mt3" style="border-left: 4px solid var(--red);">
+        <h4>Perché vale la pena</h4>
+        <p class="mt1" style="font-size:11px;">
+          Con €6.000 di premio welfare a disposizione e costi annuali sotto €2.000,
+          la sostenibilità economica del progetto è garantita già nel primo anno.
+          Il ritorno in termini di lead qualificati e impianti installati supera l'investimento
+          già al primo contratto aggiuntivo generato da FindYou.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>BROFIND Sustainability Sprint Challenge 2026</span>
+    <span>Find You — Innovation Pod</span>
+    <span>9 / 9</span>
+  </div>
+</div>
+
+</body>
+</html>

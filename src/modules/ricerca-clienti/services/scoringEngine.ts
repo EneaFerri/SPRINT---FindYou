@@ -1,4 +1,5 @@
 import { defaultScoringWeights } from '../config/scoringWeights';
+import { atecoRiskMock } from '../data/atecoRisk.mock';
 import type { Hotspot } from '../types/hotspot';
 import type { ScoreBreakdown, ScoreInput, ScoringWeights } from '../types/scoring';
 
@@ -49,9 +50,11 @@ export const inferPriority = (score: number): Hotspot['priority'] => {
 export const enrichHotspotScores = (hotspots: Hotspot[]): Hotspot[] =>
   hotspots
     .map((hotspot) => {
-      const score = calculateBrofindScore(hotspot).total;
+      const atecoEntry = atecoRiskMock.find((e) => e.code === hotspot.atecoCode);
+      const enriched = atecoEntry ? { ...hotspot, sectorRisk: atecoEntry.risk } : hotspot;
+      const score = calculateBrofindScore(enriched).total;
       return {
-        ...hotspot,
+        ...enriched,
         score,
         priority: inferPriority(score),
       };

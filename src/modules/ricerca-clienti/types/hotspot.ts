@@ -6,7 +6,9 @@ export type CompanyMatchStatus =
   | 'demo'
   | 'da verificare'
   | 'simulato'
-  | 'futuro Registro Imprese';
+  | 'futuro Registro Imprese'
+  | 'reale-OSM'
+  | 'reale-CCIAA';
 
 export interface Hotspot {
   id: string;

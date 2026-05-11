@@ -42,11 +42,12 @@ src/
   pages/LandingPage.tsx        ← 3-card module selector; imports ModuleId from App.tsx
   modules/
     ricerca-clienti/           ← active module (hotspot map + lead scoring)
-      RicercaClientiModule.tsx ← owns all state (filters, selectedHotspot, proposalOpen)
+      RicercaClientiModule.tsx ← owns all state (filters, selectedHotspot, dataSource, proposalOpen)
       components/
         dashboard/             ← MetricsCards, FiltersPanel, HotspotList, HotspotDetailCard,
-        map/                      BrofindValuePanel, FutureRoadmapPanel, HotspotMap, markers
-      data/                    ← hotspots.mock.ts, atecoRisk.mock.ts
+        map/                      BrofindValuePanel, KpiPanel, FutureRoadmapPanel, HotspotMap, markers
+      data/                    ← hotspots.mock.ts (28 mock), atecoRisk.mock.ts (28 codici),
+                                  bergamo_hotspots_real.json (50 hotspot OSM reali)
       services/                ← scoringEngine.ts, csvExport.ts, hotspotFilters.ts,
                                   futureIntegrations/ (placeholder stubs)
       types/                   ← hotspot.ts (Hotspot, HotspotFilters), scoring.ts
@@ -57,6 +58,11 @@ src/
     layout/                    ← AppShell (wraps Header + <main>), Header (back button + logos),
                                   Sidebar (scrollable right column)
     ui/                        ← Card, Button, Badge, Modal, Stat — shared across all modules
+presentation/
+  index.html                   ← presentazione PDF 9 pagine per BSSC-2026 (Chrome → Cmd+P → A4)
+backend/
+  data_extraction/             ← pipeline OSM offline: run_extraction.py, overpass_client.py,
+                                  footprint_analyzer.py, hotspot_builder.py, ateco_mapper.py
 ```
 
 **Adding a new module:** create `src/modules/<name>/`, add a card object to the `modules` array in `LandingPage.tsx`, add a case in `App.tsx`.
@@ -64,11 +70,15 @@ src/
 ### Data flow (Ricerca Clienti)
 
 ```
-hotspots.mock.ts  →  enrichHotspotScores()  →  RicercaClientiModule state  →  components
-                      scoringEngine.ts
+hotspots.mock.ts          ┐
+                          ├→  enrichHotspotScores()  →  RicercaClientiModule state  →  components
+bergamo_hotspots_real.json┘   scoringEngine.ts
+                              (uses atecoRiskMock as single source of truth for sectorRisk)
 ```
 
-`RicercaClientiModule.tsx` is the only stateful component. It derives `filteredHotspots` via `useMemo` and passes slices down as props. No global state library is used.
+`RicercaClientiModule.tsx` is the only stateful component. It holds a `dataSource: 'mock' | 'real'` toggle that switches between the two datasets. `filteredHotspots` is derived via `useMemo`. No global state library is used.
+
+**ATECO coverage:** `atecoRisk.mock.ts` contains 28 codes ordered by risk (95→38), plus `'non ancora verificato'`. `enrichHotspotScores` looks up each hotspot's `atecoCode` in this table and overrides `sectorRisk` with the table value — making `atecoRisk.mock.ts` the single source of truth. The filter dropdown in `FiltersPanel` is populated dynamically from `hotspot.atecoCode` values present in the loaded dataset.
 
 ### Scoring engine
 
@@ -94,6 +104,8 @@ FastAPI app with a `/api/hotspots` router and a scoring service that mirrors the
 
 ## Constraints
 
-- No external APIs, API keys, AI/LLM calls, or personal data — this is a sales demo
+- No external APIs, API keys, AI/LLM calls, or personal data at runtime — this is a sales demo
 - Map tiles come from OpenStreetMap via Leaflet (no Google Maps)
-- All hotspot data is mock and must stay clearly labelled as such
+- Mock hotspot data must stay clearly labelled as such
+- Real OSM data (`bergamo_hotspots_real.json`) was generated offline via `backend/data_extraction/`; Overpass/Nominatim were called only during extraction, not at runtime
+- `ateco_mapper.py` risk values must stay in sync with `atecoRisk.mock.ts`

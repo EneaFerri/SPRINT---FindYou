@@ -51,6 +51,10 @@ export const LandingPage = ({ onSelect }: { onSelect: (module: ModuleId) => void
           Seleziona il modulo con cui vuoi lavorare. Ogni area copre un reparto specifico di
           Brofind.
         </p>
+        <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-brofind-red/30 bg-white px-4 py-2 text-sm font-semibold text-brofind-red shadow-sm">
+          <span className="h-2 w-2 animate-pulse rounded-full bg-brofind-red" />
+          BROFIND SUSTAINABILITY SPRINT CHALLENGE 2026 — Innovation Pod: A. Monguzzi · E. Ferri · M. Mancuso · M. Varacalli
+        </div>
       </div>
 
       <div className="grid gap-5 md:grid-cols-3">
@@ -64,7 +68,12 @@ export const LandingPage = ({ onSelect }: { onSelect: (module: ModuleId) => void
                 : 'border-slate-200 bg-white/70 hover:border-brofind-blue/40 hover:bg-white hover:shadow-md'
             }`}
           >
-            {!active && (
+            {active ? (
+              <span className="absolute right-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-bold text-emerald-700 ring-1 ring-emerald-200">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+                LIVE
+              </span>
+            ) : (
               <span className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-800 ring-1 ring-amber-200">
                 <Construction className="h-3 w-3" />
                 Work in Progress

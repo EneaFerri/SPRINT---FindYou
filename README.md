@@ -5,21 +5,21 @@ Industrial Hotspot Intelligence Platform
 Demo tecnica locale per visualizzare hotspot industriali nella provincia di Bergamo e trasformarli
 in lead ambientali qualificabili per impianti RTO, VOC, scrubber, filtrazione e trattamento aria.
 
-La demo non usa dati personali reali, scraping, Google Maps API, API key o chiamate AI esterne.
-Tutti gli hotspot sono mock realistici e servono solo per raccontare il potenziale del prodotto.
+La demo non usa dati personali reali, scraping, Google Maps API o API key a runtime.
+I dati reali OSM (50 hotspot) sono estratti offline da OpenStreetMap e importati come JSON statico.
 
 ## Cosa mostra la demo
 
-- landing page con selezione modulo (Ricerca Clienti attivo, Ricerca Fornitori e Consulenza e Personale in Work in Progress);
+- landing page con selezione modulo (Ricerca Clienti attivo, Ricerca Fornitori e Consulenza e Personale in Work in Progress) e badge BSSC-2026;
 - mappa Leaflet/OpenStreetMap centrata su Bergamo e provincia;
-- 22 hotspot mock distribuiti in comuni industrialmente plausibili;
+- 28 hotspot mock distribuiti in comuni industrialmente plausibili, con toggle per attivare 50 hotspot reali estratti da OpenStreetMap;
 - marker con priorita alta, media e bassa;
 - scheda lead con azienda mock, ATECO simulato, emissioni potenziali e prossima azione;
-- filtri frontend per comune, priorita, score minimo, emissioni, ATECO e stato impianto;
-- Brofind Lead Score calcolato da un motore separato e configurabile;
+- filtri frontend per comune, priorita, score minimo, emissioni, ATECO (28 codici) e stato impianto;
+- Brofind Lead Score calcolato da un motore separato e configurabile (sectorRisk agganciato alla tabella ATECO come unica fonte di verita);
 - export CSV dei lead filtrati;
 - placeholder elegante per generazione futura di bozza offerta;
-- pannelli di valore interno e roadmap tecnica.
+- pannelli ESG (BrofindValuePanel, KpiPanel, FutureRoadmapPanel) con roadmap e KPI misurabili.
 
 ## Prerequisiti
 
@@ -77,23 +77,24 @@ find-you-demo/
   CLAUDE.md
   package.json
   index.html
-  vite.config.ts
-  tsconfig.json
-  tailwind.config.js
-  postcss.config.js
+  vite.config.ts / tsconfig.json / tailwind.config.js / postcss.config.js
+  presentation/
+    index.html            ← presentazione PDF 9 pagine BSSC-2026 (Chrome → Cmd+P → A4)
   src/
     main.tsx
     App.tsx               ← router state-based tra moduli
     styles/globals.css
     pages/
-      LandingPage.tsx     ← selezione modulo con 3 card
+      LandingPage.tsx     ← selezione modulo con 3 card + badge BSSC-2026
     modules/
       ricerca-clienti/    ← modulo attivo
-        RicercaClientiModule.tsx
+        RicercaClientiModule.tsx   ← stato: filters, selectedHotspot, dataSource, proposalOpen
         components/
-          dashboard/      ← MetricsCards, FiltersPanel, HotspotList, HotspotDetailCard, ...
+          dashboard/      ← MetricsCards, FiltersPanel, HotspotList, HotspotDetailCard,
+                             BrofindValuePanel, KpiPanel, FutureRoadmapPanel
           map/            ← HotspotMap, HotspotMarker, BrofindCompanyMarker, MapLegend
-        data/             ← hotspots.mock.ts, atecoRisk.mock.ts
+        data/             ← hotspots.mock.ts (28 mock), atecoRisk.mock.ts (28 codici),
+                             bergamo_hotspots_real.json (50 hotspot OSM reali, generato offline)
         services/         ← scoringEngine.ts, csvExport.ts, hotspotFilters.ts, futureIntegrations/
         types/            ← hotspot.ts, scoring.ts
         config/           ← scoringWeights.ts, mapConfig.ts
@@ -105,10 +106,13 @@ find-you-demo/
   backend/
     README.md
     app/
-      main.py
-      routers/hotspots.py
-      services/scoring_service.py
-      models/hotspot.py
+      main.py / routers/hotspots.py / services/scoring_service.py / models/hotspot.py
+    data_extraction/      ← pipeline OSM offline (non richiesta a runtime)
+      run_extraction.py   ← entry point: estrae, clustera, campiona, esporta JSON
+      overpass_client.py  ← query Overpass API con retry e multi-endpoint
+      footprint_analyzer.py ← scoring cluster: area percentile + building type + zone
+      hotspot_builder.py  ← geocoding Nominatim, business matching, costruzione oggetto
+      ateco_mapper.py     ← mappa tag OSM → codice ATECO (28 codici) + risk score
     requirements.txt
 ```
 
@@ -132,6 +136,10 @@ Il calcolo e in `src/modules/ricerca-clienti/services/scoringEngine.ts` e usa pe
 - assenza o mancata verifica impianto noto: 15%;
 - densita industriale / area strategica: 10%.
 
+Il `sectorRisk` di ogni hotspot viene risolto dinamicamente dalla tabella `atecoRisk.mock.ts` in
+base al codice ATECO dell'hotspot. La tabella e la singola fonte di verita: modificare il risk di
+un codice si riflette automaticamente sullo score di tutti gli hotspot con quel codice.
+
 La struttura consente di aggiungere parametri futuri senza accoppiare la logica ai componenti React.
 
 ## Predisposizione PostgreSQL + PostGIS
@@ -149,14 +157,13 @@ scheda lead e mappa.
 
 ## Roadmap tecnica
 
-Fase 0 - Demo Challenge:
+Fase 0 - Demo Challenge (LIVE — maggio 2026):
 
-- mappa Bergamo;
-- mock hotspot;
-- score demo;
-- filtri;
-- export CSV;
-- storytelling del valore Brofind.
+- mappa Bergamo con 28 hotspot mock + 50 reali OSM;
+- score engine con 28 codici ATECO agganciati alla tabella di rischio;
+- filtri, export CSV, KpiPanel, BrofindValuePanel ESG, FutureRoadmapPanel;
+- pipeline Python offline (Overpass + Nominatim + DBSCAN clustering);
+- presentazione PDF 9 pagine per BSSC-2026.
 
 Fase 1 - MVP:
 
@@ -187,9 +194,11 @@ Fase 3 - AI e automazione:
 
 - nessun dato personale reale;
 - nessuno scraping;
-- nessuna API key;
+- nessuna API key a runtime;
 - nessuna Google Maps API;
-- nessuna chiamata a OpenAI, Claude o altri LLM;
+- nessuna chiamata a OpenAI, Claude o altri LLM a runtime;
 - OpenStreetMap come base map tramite Leaflet;
+- dati OSM estratti offline (Overpass + Nominatim) e importati come JSON statico;
+- `atecoRisk.mock.ts` e `ateco_mapper.py` devono restare sincronizzati (stessi codici e risk);
 - architettura modulare pronta per integrazioni future;
 - demo specifica per Brofind Find You, pensata per sales, tecnico e management.

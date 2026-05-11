@@ -5,29 +5,48 @@ import { FiltersPanel } from './components/dashboard/FiltersPanel';
 import { HotspotList } from './components/dashboard/HotspotList';
 import { HotspotDetailCard } from './components/dashboard/HotspotDetailCard';
 import { BrofindValuePanel } from './components/dashboard/BrofindValuePanel';
+import { KpiPanel } from './components/dashboard/KpiPanel';
 import { FutureRoadmapPanel } from './components/dashboard/FutureRoadmapPanel';
 import { HotspotMap } from './components/map/HotspotMap';
 import { Modal } from '../../components/ui/Modal';
 import { bergamoHotspotsMock } from './data/hotspots.mock';
+import realHotspotsRaw from './data/bergamo_hotspots_real.json';
 import { defaultFilters, filterHotspots } from './services/hotspotFilters';
 import { enrichHotspotScores } from './services/scoringEngine';
 import { exportHotspotsToCsv } from './services/csvExport';
 import type { Hotspot, HotspotFilters } from './types/hotspot';
 
+type DataSource = 'mock' | 'real';
+
+const realHotspots = realHotspotsRaw as unknown as Hotspot[];
+
 export const RicercaClientiModule = () => {
-  const allHotspots = useMemo(() => enrichHotspotScores(bergamoHotspotsMock), []);
+  const [dataSource, setDataSource] = useState<DataSource>('mock');
+
+  const allHotspots = useMemo(
+    () => enrichHotspotScores(dataSource === 'real' ? realHotspots : bergamoHotspotsMock),
+    [dataSource],
+  );
+
   const [filters, setFilters] = useState<HotspotFilters>(defaultFilters);
   const filteredHotspots = useMemo(
     () => filterHotspots(allHotspots, filters),
     [allHotspots, filters],
   );
-  const [selectedHotspotId, setSelectedHotspotId] = useState(allHotspots[0]?.id);
+
+  const [selectedHotspotId, setSelectedHotspotId] = useState<string | undefined>(undefined);
   const [proposalOpen, setProposalOpen] = useState(false);
 
   const selectedHotspot =
-    filteredHotspots.find((hotspot) => hotspot.id === selectedHotspotId) ?? filteredHotspots[0];
+    filteredHotspots.find((h) => h.id === selectedHotspotId) ?? filteredHotspots[0];
 
   const selectHotspot = (hotspot: Hotspot) => setSelectedHotspotId(hotspot.id);
+
+  const handleToggleDataSource = () => {
+    setDataSource((prev) => (prev === 'mock' ? 'real' : 'mock'));
+    setSelectedHotspotId(undefined);
+    setFilters(defaultFilters);
+  };
 
   return (
     <>
@@ -40,7 +59,13 @@ export const RicercaClientiModule = () => {
             onSelectHotspot={selectHotspot}
           />
           <Sidebar>
-            <FiltersPanel hotspots={allHotspots} filters={filters} onChange={setFilters} />
+            <FiltersPanel
+              hotspots={allHotspots}
+              filters={filters}
+              onChange={setFilters}
+              dataSource={dataSource}
+              onToggleDataSource={handleToggleDataSource}
+            />
             <HotspotDetailCard
               hotspot={selectedHotspot}
               onExport={() => exportHotspotsToCsv(filteredHotspots)}
@@ -54,6 +79,7 @@ export const RicercaClientiModule = () => {
           </Sidebar>
         </div>
         <BrofindValuePanel />
+        <KpiPanel />
         <FutureRoadmapPanel />
       </div>
       <Modal

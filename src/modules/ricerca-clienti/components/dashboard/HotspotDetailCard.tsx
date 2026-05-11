@@ -26,11 +26,17 @@ export const HotspotDetailCard = ({
     );
   }
 
+  const isRealOsm = hotspot.companyMatchStatus === 'reale-OSM';
+  const isRealCciaa = hotspot.companyMatchStatus === 'reale-CCIAA';
+  const isReal = isRealOsm || isRealCciaa;
+
   return (
     <Card className="p-5">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-bold uppercase tracking-wide text-brofind-blue">Scheda lead demo</p>
+          <p className="text-xs font-bold uppercase tracking-wide text-brofind-blue">
+            {isReal ? 'Scheda lead reale' : 'Scheda lead demo'}
+          </p>
           <h2 className="mt-1 text-xl font-black text-slate-950">{hotspot.name}</h2>
           <p className="text-sm text-slate-500">{hotspot.municipality} · {hotspot.areaType}</p>
         </div>
@@ -41,16 +47,49 @@ export const HotspotDetailCard = ({
       </div>
 
       <div className="mt-4 grid gap-3 text-sm">
-        <div className="rounded-lg bg-slate-50 p-3">
-          <p className="font-bold text-slate-950">{hotspot.mockCompany}</p>
-          <p className="mt-1 text-slate-600">
-            ATECO {hotspot.atecoCode}: {hotspot.atecoDescription}
-          </p>
+        <div className={`rounded-lg p-3 ${isReal ? 'bg-emerald-50 border border-emerald-200' : 'bg-slate-50'}`}>
+          {isRealOsm ? (
+            <>
+              <p className="font-bold text-slate-950">Azienda da verificare — dati OSM</p>
+              <p className="mt-1 text-slate-600">
+                ATECO {hotspot.atecoCode}: {hotspot.atecoDescription}
+              </p>
+              <a
+                href="https://www.infocamere.it"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-emerald-700 hover:underline"
+              >
+                Cerca su Registro Imprese →
+              </a>
+            </>
+          ) : isRealCciaa ? (
+            <>
+              <p className="font-bold text-slate-950">{hotspot.mockCompany}</p>
+              <p className="mt-1 text-slate-600">
+                ATECO {hotspot.atecoCode}: {hotspot.atecoDescription}
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="font-bold text-slate-950">{hotspot.mockCompany}</p>
+              <p className="mt-1 text-slate-600">
+                ATECO {hotspot.atecoCode}: {hotspot.atecoDescription}
+              </p>
+            </>
+          )}
         </div>
         <div className="grid grid-cols-2 gap-3">
           <Info label="Dimensione stimata" value={`${hotspot.estimatedSizeSqm.toLocaleString('it-IT')} m²`} />
           <Info label="Impianto noto" value={hotspot.knownAbatementPlant} />
-          <Info label="Matching azienda" value={hotspot.companyMatchStatus} />
+          <Info
+            label="Fonte dati"
+            value={
+              isRealOsm ? 'OpenStreetMap'
+              : isRealCciaa ? 'Registro Imprese'
+              : hotspot.companyMatchStatus
+            }
+          />
           <Info label="Settore rischio" value={`${hotspot.sectorRisk}/100`} />
         </div>
         <div>
