@@ -7,6 +7,8 @@ import { HotspotDetailCard } from './components/dashboard/HotspotDetailCard';
 import { BrofindValuePanel } from './components/dashboard/BrofindValuePanel';
 import { KpiPanel } from './components/dashboard/KpiPanel';
 import { FutureRoadmapPanel } from './components/dashboard/FutureRoadmapPanel';
+import { AnalysisPanel } from './components/dashboard/AnalysisPanel';
+import { AnalysisModal } from './components/dashboard/AnalysisModal';
 import { HotspotMap } from './components/map/HotspotMap';
 import { Modal } from '../../components/ui/Modal';
 import { bergamoHotspotsMock } from './data/hotspots.mock';
@@ -36,6 +38,8 @@ export const RicercaClientiModule = () => {
 
   const [selectedHotspotId, setSelectedHotspotId] = useState<string | undefined>(undefined);
   const [proposalOpen, setProposalOpen] = useState(false);
+  const [analysisOpen, setAnalysisOpen] = useState(false);
+  const [analysisStep, setAnalysisStep] = useState(0);
 
   const selectedHotspot =
     filteredHotspots.find((h) => h.id === selectedHotspotId) ?? filteredHotspots[0];
@@ -48,9 +52,25 @@ export const RicercaClientiModule = () => {
     setFilters(defaultFilters);
   };
 
+  const handleStartAnalysis = () => {
+    setAnalysisOpen(true);
+    setAnalysisStep(0);
+    const delays = [400, 950, 1700, 2400, 3000, 3500];
+    delays.forEach((ms, i) => setTimeout(() => setAnalysisStep(i + 1), ms));
+  };
+
+  const handleAnalysisComplete = () => {
+    setDataSource('real');
+    setSelectedHotspotId(undefined);
+    setFilters(defaultFilters);
+    setAnalysisOpen(false);
+    setAnalysisStep(0);
+  };
+
   return (
     <>
       <div className="space-y-5">
+        <AnalysisPanel onAnalyze={handleStartAnalysis} analysisRunning={analysisOpen} />
         <MetricsCards hotspots={filteredHotspots} />
         <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_440px]">
           <HotspotMap
@@ -82,6 +102,11 @@ export const RicercaClientiModule = () => {
         <KpiPanel />
         <FutureRoadmapPanel />
       </div>
+      <AnalysisModal
+        open={analysisOpen}
+        currentStep={analysisStep}
+        onComplete={handleAnalysisComplete}
+      />
       <Modal
         open={proposalOpen}
         title="Genera Bozza Offerta - funzione futura"
