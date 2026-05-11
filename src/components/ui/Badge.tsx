@@ -1,4 +1,4 @@
-import type { PriorityLevel } from '../../types/hotspot';
+type PriorityLevel = 'high' | 'medium' | 'low';
 
 const priorityClasses: Record<PriorityLevel, string> = {
   high: 'bg-brofind-red text-white',

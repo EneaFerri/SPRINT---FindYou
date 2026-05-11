@@ -1,5 +1,5 @@
 import { Bot, DatabaseZap, Map, Rocket } from 'lucide-react';
-import { Card } from '../ui/Card';
+import { Card } from '../../../../components/ui/Card';
 
 const phases = [
   {

@@ -1,10 +1,17 @@
-import { Factory, Leaf, Radar, UsersRound } from 'lucide-react';
+import { ArrowLeft, Factory, Leaf, Radar, UsersRound } from 'lucide-react';
 
-export const Header = () => (
+export const Header = ({ onBack }: { onBack: () => void }) => (
   <header className="relative overflow-hidden border-b border-slate-200 bg-white">
     <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brofind-red via-brofind-blue to-brofind-cyan" />
     <div className="mx-auto flex max-w-[1600px] flex-col items-center gap-6 px-4 py-6 text-center lg:px-6">
       <div className="flex w-full max-w-4xl flex-col items-center">
+        <button
+          onClick={onBack}
+          className="mb-4 flex items-center gap-1.5 self-start rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Torna ai moduli
+        </button>
         <div className="mb-3 flex flex-wrap items-center justify-center gap-2">
           <span className="inline-flex items-center gap-2 rounded-full bg-red-50 px-3 py-1 text-xs font-bold uppercase tracking-wide text-brofind-red ring-1 ring-red-100">
             <Radar className="h-4 w-4" />

@@ -1,6 +1,6 @@
 import { ArrowDownWideNarrow, MapPin } from 'lucide-react';
-import { Badge } from '../ui/Badge';
-import { Card } from '../ui/Card';
+import { Badge } from '../../../../components/ui/Badge';
+import { Card } from '../../../../components/ui/Card';
 import type { Hotspot } from '../../types/hotspot';
 
 export const HotspotList = ({

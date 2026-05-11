@@ -1,5 +1,5 @@
 import { Building2, Factory, MapPinned, Percent, Ruler } from 'lucide-react';
-import { Stat } from '../ui/Stat';
+import { Stat } from '../../../../components/ui/Stat';
 import type { Hotspot } from '../../types/hotspot';
 
 const formatSqm = (sqm: number) => `${Math.round(sqm / 1000).toLocaleString('it-IT')}k m²`;

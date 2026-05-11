@@ -1,10 +1,10 @@
 import { Leaf, LineChart, Network, UsersRound, Wrench, Zap } from 'lucide-react';
-import { Card } from '../ui/Card';
+import { Card } from '../../../../components/ui/Card';
 
 const benefits = [
   {
     title: 'Sales piu rapido',
-    body: 'Riduce tempo di prospecting e porta subito l’attenzione su zone e aziende candidate.',
+    body: "Riduce tempo di prospecting e porta subito l'attenzione su zone e aziende candidate.",
     Icon: Zap,
   },
   {

@@ -1,7 +1,7 @@
 import { ClipboardList, Download, FileText, Save, Wrench } from 'lucide-react';
-import { Badge } from '../ui/Badge';
-import { Button } from '../ui/Button';
-import { Card } from '../ui/Card';
+import { Badge } from '../../../../components/ui/Badge';
+import { Button } from '../../../../components/ui/Button';
+import { Card } from '../../../../components/ui/Card';
 import type { Hotspot } from '../../types/hotspot';
 
 export const HotspotDetailCard = ({

@@ -1,6 +1,6 @@
 import L from 'leaflet';
 import { Marker, Popup } from 'react-leaflet';
-import { Badge } from '../ui/Badge';
+import { Badge } from '../../../../components/ui/Badge';
 import type { Hotspot, PriorityLevel } from '../../types/hotspot';
 
 const markerColor: Record<PriorityLevel, string> = {
