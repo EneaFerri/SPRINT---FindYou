@@ -30,20 +30,49 @@ There is no test suite. Type safety is enforced by `tsc` (run implicitly via `np
 
 ## Architecture
 
-This is a **React 18 + TypeScript + Vite** single-page application styled with Tailwind CSS. The frontend is fully self-contained — the backend (`backend/`) is a FastAPI skeleton predisposed for a future MVP and is not used by the running demo.
+**React 18 + TypeScript + Vite** SPA styled with Tailwind CSS. The frontend is fully self-contained — the backend (`backend/`) is a FastAPI skeleton not used by the running demo.
 
-### Data flow
+### Multi-module routing
+
+`App.tsx` holds a `currentModule: ModuleId` state. On `'landing'` it renders `LandingPage`; on any other value it renders `AppShell` wrapping the corresponding module component. No routing library is used.
 
 ```
-hotspots.mock.ts  →  enrichHotspotScores()  →  App state  →  components
+src/
+  App.tsx                      ← state-based router; exports ModuleId type
+  pages/LandingPage.tsx        ← 3-card module selector; imports ModuleId from App.tsx
+  modules/
+    ricerca-clienti/           ← active module (hotspot map + lead scoring)
+      RicercaClientiModule.tsx ← owns all state (filters, selectedHotspot, proposalOpen)
+      components/
+        dashboard/             ← MetricsCards, FiltersPanel, HotspotList, HotspotDetailCard,
+        map/                      BrofindValuePanel, FutureRoadmapPanel, HotspotMap, markers
+      data/                    ← hotspots.mock.ts, atecoRisk.mock.ts
+      services/                ← scoringEngine.ts, csvExport.ts, hotspotFilters.ts,
+                                  futureIntegrations/ (placeholder stubs)
+      types/                   ← hotspot.ts (Hotspot, HotspotFilters), scoring.ts
+      config/                  ← scoringWeights.ts, mapConfig.ts
+    ricerca-fornitori/         ← WIP module
+    consulenza-personale/      ← WIP module
+  components/
+    layout/                    ← AppShell (wraps Header + <main>), Header (back button + logos),
+                                  Sidebar (scrollable right column)
+    ui/                        ← Card, Button, Badge, Modal, Stat — shared across all modules
+```
+
+**Adding a new module:** create `src/modules/<name>/`, add a card object to the `modules` array in `LandingPage.tsx`, add a case in `App.tsx`.
+
+### Data flow (Ricerca Clienti)
+
+```
+hotspots.mock.ts  →  enrichHotspotScores()  →  RicercaClientiModule state  →  components
                       scoringEngine.ts
 ```
 
-`App.tsx` is the single stateful component. It holds `filters` and `selectedHotspotId`, derives `filteredHotspots` via `useMemo`, and passes slices down to leaf components as props. No global state library is used.
+`RicercaClientiModule.tsx` is the only stateful component. It derives `filteredHotspots` via `useMemo` and passes slices down as props. No global state library is used.
 
-### Scoring engine (`src/services/scoringEngine.ts`)
+### Scoring engine
 
-`enrichHotspotScores` re-computes the Brofind Lead Score for every hotspot at app startup. `calculateBrofindScore` combines five normalised sub-scores with configurable weights from `src/config/scoringWeights.ts`:
+`enrichHotspotScores` in `src/modules/ricerca-clienti/services/scoringEngine.ts` re-computes the Brofind Lead Score at module mount. `calculateBrofindScore` combines five normalised sub-scores with weights from `src/modules/ricerca-clienti/config/scoringWeights.ts`:
 
 | Factor | Weight |
 |---|---|
@@ -55,33 +84,9 @@ hotspots.mock.ts  →  enrichHotspotScores()  →  App state  →  components
 
 Score thresholds: ≥ 75 → `high`, ≥ 55 → `medium`, < 55 → `low`.
 
-To tune scoring, edit `src/config/scoringWeights.ts`; to change sub-score normalisation logic, edit `scoringEngine.ts`.
+### Shared UI notes
 
-### Multi-module architecture
-
-`App.tsx` holds a `currentModule: ModuleId` state and renders either the `LandingPage` or an `AppShell`-wrapped module. To add a new module: create `src/modules/<name>/`, add a card to `LandingPage.tsx`, and add a case in `App.tsx`.
-
-```
-src/
-  App.tsx                     ← state-based router (no react-router)
-  pages/LandingPage.tsx       ← 3-card module selector
-  modules/
-    ricerca-clienti/          ← active module (hotspot map + scoring)
-      RicercaClientiModule.tsx
-      components/dashboard/
-      components/map/
-      data/                   ← mock hotspots and ATECO risk table
-      services/               ← scoringEngine, csvExport, hotspotFilters, futureIntegrations/
-      types/                  ← Hotspot, HotspotFilters, ScoreBreakdown, ScoringWeights
-      config/                 ← scoringWeights, mapConfig
-    ricerca-fornitori/        ← WIP module
-    consulenza-personale/     ← WIP module
-  components/
-    layout/                   ← AppShell (wraps Header + main), Header (back button + logos), Sidebar
-    ui/                       ← Card, Button, Badge, Modal, Stat (shared across all modules)
-```
-
-`Badge.tsx` defines `PriorityLevel` locally (`'high' | 'medium' | 'low'`) so it has no dependency on module-specific types.
+`Badge.tsx` defines `PriorityLevel` locally (`'high' | 'medium' | 'low'`) so it has no dependency on module-specific types. All other `src/components/ui/` primitives are fully generic.
 
 ### Backend skeleton (`backend/`)
 

@@ -10,6 +10,7 @@ Tutti gli hotspot sono mock realistici e servono solo per raccontare il potenzia
 
 ## Cosa mostra la demo
 
+- landing page con selezione modulo (Ricerca Clienti attivo, Ricerca Fornitori e Consulenza e Personale in Work in Progress);
 - mappa Leaflet/OpenStreetMap centrata su Bergamo e provincia;
 - 22 hotspot mock distribuiti in comuni industrialmente plausibili;
 - marker con priorita alta, media e bassa;
@@ -73,6 +74,7 @@ uvicorn app.main:app --reload --port 8000
 ```text
 find-you-demo/
   README.md
+  CLAUDE.md
   package.json
   index.html
   vite.config.ts
@@ -81,27 +83,25 @@ find-you-demo/
   postcss.config.js
   src/
     main.tsx
-    App.tsx
+    App.tsx               ← router state-based tra moduli
     styles/globals.css
-    data/
-      hotspots.mock.ts
-      atecoRisk.mock.ts
-    types/
-      hotspot.ts
-      scoring.ts
-    config/
-      scoringWeights.ts
-      mapConfig.ts
-    services/
-      scoringEngine.ts
-      csvExport.ts
-      hotspotFilters.ts
-      futureIntegrations/
+    pages/
+      LandingPage.tsx     ← selezione modulo con 3 card
+    modules/
+      ricerca-clienti/    ← modulo attivo
+        RicercaClientiModule.tsx
+        components/
+          dashboard/      ← MetricsCards, FiltersPanel, HotspotList, HotspotDetailCard, ...
+          map/            ← HotspotMap, HotspotMarker, BrofindCompanyMarker, MapLegend
+        data/             ← hotspots.mock.ts, atecoRisk.mock.ts
+        services/         ← scoringEngine.ts, csvExport.ts, hotspotFilters.ts, futureIntegrations/
+        types/            ← hotspot.ts, scoring.ts
+        config/           ← scoringWeights.ts, mapConfig.ts
+      ricerca-fornitori/  ← modulo WIP
+      consulenza-personale/ ← modulo WIP
     components/
-      layout/
-      map/
-      dashboard/
-      ui/
+      layout/             ← AppShell, Header, Sidebar (condivisi tra moduli)
+      ui/                 ← Card, Button, Badge, Modal, Stat (condivisi tra moduli)
   backend/
     README.md
     app/
@@ -123,8 +123,8 @@ find-you-demo/
 
 ## Score Engine demo
 
-Il calcolo e in `src/services/scoringEngine.ts` e usa pesi configurati in
-`src/config/scoringWeights.ts`:
+Il calcolo e in `src/modules/ricerca-clienti/services/scoringEngine.ts` e usa pesi configurati in
+`src/modules/ricerca-clienti/config/scoringWeights.ts`:
 
 - rischio ATECO / settore: 35%;
 - dimensione sito: 20%;
